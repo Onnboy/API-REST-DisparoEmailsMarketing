@@ -1,135 +1,205 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    <!-- Página de Login -->
-    <div class="login-container" id="login-container">
-        <h1>Login</h1>
-        <form id="login-form">
-            <div class="input-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" name="username" required placeholder="Digite seu usuário">
-            </div>
 
-            <div class="input-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" required placeholder="Digite sua senha">
-            </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login ADM</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
 
-            <button type="submit" class="btn-login">Entrar</button>
-        </form>
-        <p id="error-message" style="color: red; display: none;">Usuário ou senha incorretos!</p>
-    </div>
-
-    <!-- Página Principal -->
-    <div class="main-container" id="main-container" style="display: none;">
-        <div class="navbar">
-            <ul>
-                <li><a href="#" id="disparo">Disparo de E-mails</a></li>
-                <li><a href="#" id="acessar-emails">Acessar E-mails dos Clientes</a></li>
-            </ul>
-        </div>
-
-        <div class="container" id="container-disparo">
-            <h1>Disparo de E-mail</h1>
-            <form action="#" method="post">
+    <body>
+        <!-- Página de Login -->
+        <div class="login-container" id="login-container">
+            <h1>Login</h1>
+            <form id="login-form">
                 <div class="input-group">
-                    <label for="destinatario">Destinatário</label>
-                    <input type="email" id="destinatario" name="destinatario" required placeholder="exemplo@dominio.com">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" required placeholder="Digite seu usuário">
                 </div>
 
                 <div class="input-group">
-                    <label for="assunto">Assunto</label>
-                    <input type="text" id="assunto" name="assunto" required placeholder="Assunto do E-mail">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required placeholder="Digite sua senha">
                 </div>
 
-                <div class="input-group">
-                    <label for="mensagem">Mensagem</label>
-                    <textarea id="mensagem" name="mensagem" rows="6" required placeholder="Digite sua mensagem aqui..."></textarea>
-                </div>
-
-                <button type="submit" class="btn-enviar">Enviar E-mail</button>
+                <button type="submit" class="btn-login">Entrar</button>
             </form>
+            <p id="error-message" style="color: red; display: none;">Usuário ou senha incorretos!</p>
         </div>
 
-        <div class="container" id="container-emails" style="display: none;">
-            <h1>E-mails dos Clientes</h1>
-            <ul class="email-list" id="email-list">
-                <!-- A lista de e-mails será gerada aqui -->
-            </ul>
-            
-            <h2>Adicionar Novo E-mail</h2>
-            <div class="input-group">
-                <label for="novo-email">Novo E-mail</label>
-                <input type="email" id="novo-email" placeholder="novoemail@dominio.com">
+        <!-- Página Principal -->
+        <div class="main-container" id="main-container" style="display: none;">
+            <div class="navbar">
+                <ul>
+                    <li><a href="#" id="disparo">Disparo de E-mails</a></li>
+                    <li><a href="#" id="acessar-emails">Acessar E-mails dos Clientes</a></li>
+                </ul>
             </div>
-            <button onclick="adicionarEmail()" class="btn-adicionar">Adicionar E-mail</button>
+
+            <div class="container" id="container-disparo">
+                <h1>Disparo de E-mail</h1>
+                <form action="#" method="post">
+                    <div class="input-group">
+                        <label for="destinatario">Destinatário</label>
+                        <input type="email" id="destinatario" name="destinatario" required
+                            placeholder="exemplo@dominio.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="assunto">Assunto</label>
+                        <input type="text" id="assunto" name="assunto" required placeholder="Assunto do E-mail">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="mensagem">Mensagem</label>
+                        <textarea id="mensagem" name="mensagem" rows="6" required
+                            placeholder="Digite sua mensagem aqui..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="anexo">Anexar Imagem</label>
+                        <input type="file" id="anexo" name="anexo" accept="image/*">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="agendamento">Agendar Envio</label>
+                        <input type="datetime-local" id="agendamento" name="agendamento">
+                    </div>
+
+                    <button type="submit" class="btn-enviar">Enviar E-mail</button>
+                </form>
+            </div>
+
+            <div class="container" id="container-emails" style="display: none;">
+                <h1>E-mails dos Clientes</h1>
+                <ul class="email-list" id="email-list">
+                    <!-- A lista de e-mails será gerada aqui -->
+                </ul>
+
+                <h2>Adicionar Novo E-mail</h2>
+                <div class="input-group">
+                    <label for="novo-email">Novo E-mail</label>
+                    <input type="email" id="novo-email" placeholder="novoemail@dominio.com">
+                </div>
+                <button onclick="adicionarEmail()" class="btn-adicionar">Adicionar E-mail</button>
+            </div>
         </div>
-    </div>
 
-    <script>
-        // Função de login
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o envio do formulário
+        <script>
+            // Função de login
+            document.getElementById('login-form').addEventListener('submit', function (event) {
+                event.preventDefault(); // Impede o envio do formulário
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
 
-            // Verifica se o login é válido
-            if (username === 'Tuquis' && password === '123456') {
-                // Oculta a tela de login e exibe a tela principal
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('main-container').style.display = 'block';
-            } else {
-                // Exibe mensagem de erro
-                document.getElementById('error-message').style.display = 'block';
-            }
-        });
-
-        // Lista de e-mails (no JavaScript)
-        let listaEmails = [
-          
-        ];
-
-        // Função para alternar entre as telas
-        document.getElementById('disparo').addEventListener('click', function() {
-            document.getElementById('container-disparo').style.display = 'block';
-            document.getElementById('container-emails').style.display = 'none';
-        });
-
-        document.getElementById('acessar-emails').addEventListener('click', function() {
-            document.getElementById('container-disparo').style.display = 'none';
-            document.getElementById('container-emails').style.display = 'block';
-            exibirEmails(); // Atualiza a lista de e-mails quando acessar a página
-        });
-
-        // Função para exibir os e-mails na lista
-        function exibirEmails() {
-            const listaElement = document.getElementById('email-list');
-            listaElement.innerHTML = ''; // Limpa a lista antes de adicionar os novos e-mails
-            listaEmails.forEach(email => {
-                const li = document.createElement('li');
-                li.textContent = email;
-                listaElement.appendChild(li);
+                // Verifica se o login é válido
+                if (username === 'Tuquis' && password === '123456') {
+                    // Oculta a tela de login e exibe a tela principal
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('main-container').style.display = 'block';
+                } else {
+                    // Exibe mensagem de erro
+                    document.getElementById('error-message').style.display = 'block';
+                }
             });
-        }
 
-        
-        function adicionarEmail() {
-            const novoEmail = document.getElementById('novo-email').value;
-            if (novoEmail && !listaEmails.includes(novoEmail)) {
-                listaEmails.push(novoEmail); 
-                document.getElementById('novo-email').value = ''; 
-                exibirEmails(); 
-            } else {
-                alert('E-mail inválido ou já existente!');
+            // Lista de e-mails (no JavaScript)
+            let listaEmails = [
+
+            ];
+
+            // Função para alternar entre as telas
+            document.getElementById('disparo').addEventListener('click', function () {
+                document.getElementById('container-disparo').style.display = 'block';
+                document.getElementById('container-emails').style.display = 'none';
+            });
+
+            document.getElementById('acessar-emails').addEventListener('click', function () {
+                document.getElementById('container-disparo').style.display = 'none';
+                document.getElementById('container-emails').style.display = 'block';
+                exibirEmails(); // Atualiza a lista de e-mails quando acessar a página
+            });
+
+            // Função para exibir os e-mails na lista
+            function exibirEmails() {
+                const listaElement = document.getElementById('email-list');
+                listaElement.innerHTML = ''; // Limpa a lista antes de adicionar os novos e-mails
+                listaEmails.forEach(email => {
+                    const li = document.createElement('li');
+                    li.textContent = email;
+                    listaElement.appendChild(li);
+                });
             }
-        }
-    </script>
-</body>
+
+
+            async function adicionarEmail() {
+                const novoEmail = document.getElementById('novo-email').value;
+
+                if (!novoEmail) {
+                    alert('Por favor, insira um email válido.');
+                    return;
+                }
+
+                try {
+                    const resposta = await fetch('/adicionar_email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nome: '', sobrenome: '', email: novoEmail }),
+                    });
+
+                    const resultado = await resposta.json();
+
+                    if (resposta.ok) {
+                        alert('Email adicionado com sucesso!');
+                        document.getElementById('novo-email').value = ''; // Limpa o campo
+                        exibirEmails(); // Atualiza a lista de emails
+                    } else {
+                        alert(resultado.erro || 'Erro ao adicionar email.');
+                    }
+                } catch (erro) {
+                    alert('Erro ao conectar com o servidor.');
+                }
+            }
+
+            //Função para enviar email (disparo de email)
+            document.querySelector('#container-disparo form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const destinatario = document.getElementById('destinatario').value;
+                const assunto = document.getElementById('assunto').value;
+                const mensagem = document.getElementById('mensagem').value;
+                const anexo = document.getElementById('anexo').files[0];
+                const agendamento = document.getElementById('agendamento').value;
+
+                const formData = new FormData();
+                formData.append('destinatario', destinatario);
+                formData.append('assunto', assunto);
+                formData.append('mensagem', mensagem);
+                formData.append('anexo', anexo);
+                formData.append('agendamento', agendamento);
+
+                try {
+                    const resposta = await fetch('/enviar_email', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const resultado = await resposta.json();
+
+                    if (resposta.ok) {
+                        alert('Email enviado com sucesso!');
+                    } else {
+                        alert(resultado.erro || 'Erro ao enviar email!');
+                    }
+                } catch (erro) {
+                    alert('Erro ao conectar com o servidor!');
+                }
+            });
+        </script>
+    </body>
+
 </html>
