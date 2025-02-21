@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+import csv
+from io import StringIO
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -123,6 +125,31 @@ def remover_email(id):
         return jsonify({"mensagem": "Email removido com sucesso!"})
     except Exception as e:
         return jsonify({"erro": str(e)}), 400
+    finally:
+        cursor.close()
+        db.close()
+
+@app.route('/importar_emails', methods=['POST'])
+def importar_emails():
+    arquivo = request.files['arquivo']
+    if not arquivo:
+        return jsonify({"erro": "Nenhum arquivo enviado."}), 400
+
+    try:
+        conteudo = arquivo.read().decode('utf-8')
+        leitor_csv = csv.reader(StringIO(conteudo))
+        db = conectar_bd()
+        cursor = db.cursor()
+
+        for linha in leitor_csv:
+            nome, sobrenome, email = linha
+            cursor.execute("INSERT INTO clientes (nome, sobrenome, email) VALUES (%s, %s, %s)", 
+                           (nome, sobrenome, email))
+        
+        db.commit()
+        return jsonify({"mensagem": "Emails importados com sucesso!"})
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
     finally:
         cursor.close()
         db.close()

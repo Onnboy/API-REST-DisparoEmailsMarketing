@@ -39,11 +39,20 @@
 
             <div class="container" id="container-disparo">
                 <h1>Disparo de E-mail</h1>
+                <div class="input-group">
+                    <label for="campo-dinamico">Campo Dinâmico</label>
+                    <select id="campo-dinamico">
+                        <option value="nome">Nome</option>
+                        <option value="sobrenome">Sobrenome</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
+
                 <form action="#" method="post">
                     <div class="input-group">
-                        <label for="destinatario">Destinatário</label>
-                        <input type="email" id="destinatario" name="destinatario" required
-                            placeholder="exemplo@dominio.com">
+                        <label for="destinatarios">Destinatários</label>
+                        <textarea id="destinatarios" name="destinatarios" rows="3" required
+                            placeholder="exemplo1@dominio.com, exemplo2@dominio.com"></textarea>
                     </div>
 
                     <div class="input-group">
@@ -66,6 +75,12 @@
                         <label for="agendamento">Agendar Envio</label>
                         <input type="datetime-local" id="agendamento" name="agendamento">
                     </div>
+
+                    <div class="input-group">
+                        <label for="importar-emails">Importar Lista de Emails (CSV)</label>
+                        <input type="file" id="importar-emails" accept=".csv">
+                    </div>
+                    <button onclick="importarEmails()" class="btn-importar">Importar Emails</button>
 
                     <button type="submit" class="btn-enviar">Enviar E-mail</button>
                 </form>
@@ -125,10 +140,24 @@
             // Função para exibir os e-mails na lista
             function exibirEmails() {
                 const listaElement = document.getElementById('email-list');
-                listaElement.innerHTML = ''; // Limpa a lista antes de adicionar os novos e-mails
+                listaElement.innerHTML = '';
+
                 listaEmails.forEach(email => {
                     const li = document.createElement('li');
                     li.textContent = email;
+
+                    // Botão de remover
+                    const btnRemover = document.createElement('button');
+                    btnRemover.textContent = 'Remover';
+                    btnRemover.onclick = () => removerEmail(email.id); // Supondo que cada email tenha um ID
+                    li.appendChild(btnRemover);
+
+                    // Botão de atualizar
+                    const btnAtualizar = document.createElement('button');
+                    btnAtualizar.textContent = 'Atualizar';
+                    btnAtualizar.onclick = () => atualizarEmail(email.id); // Supondo que cada email tenha um ID
+                    li.appendChild(btnAtualizar);
+
                     listaElement.appendChild(li);
                 });
             }
@@ -169,36 +198,61 @@
             document.querySelector('#container-disparo form').addEventListener('submit', async function (event) {
                 event.preventDefault();
 
-                const destinatario = document.getElementById('destinatario').value;
+                const destinatarios = document.getElementById('destinatarios').value.split(',').map(email => email.trim());
                 const assunto = document.getElementById('assunto').value;
                 const mensagem = document.getElementById('mensagem').value;
-                const anexo = document.getElementById('anexo').files[0];
-                const agendamento = document.getElementById('agendamento').value;
-
-                const formData = new FormData();
-                formData.append('destinatario', destinatario);
-                formData.append('assunto', assunto);
-                formData.append('mensagem', mensagem);
-                formData.append('anexo', anexo);
-                formData.append('agendamento', agendamento);
 
                 try {
                     const resposta = await fetch('/enviar_email', {
                         method: 'POST',
-                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ destinatarios, assunto, mensagem }),
                     });
 
                     const resultado = await resposta.json();
 
                     if (resposta.ok) {
-                        alert('Email enviado com sucesso!');
+                        alert('Emails enviados com sucesso!');
                     } else {
-                        alert(resultado.erro || 'Erro ao enviar email!');
+                        alert(resultado.erro || 'Erro ao enviar emails!');
                     }
                 } catch (erro) {
                     alert('Erro ao conectar com o servidor!');
                 }
+
+                async function importarEmails() {
+                    const arquivo = document.getElementById('importar-emails').files[0];
+
+                    if (!arquivo) {
+                        alert('Por favor, selecione um arquivo CSV.');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('arquivo', arquivo);
+
+                    try {
+                        const resposta = await fetch('/importar_emails', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const resultado = await resposta.json();
+
+                        if (resposta.ok) {
+                            alert('Emails importados com sucesso!');
+                            exibirEmails(); // Atualiza a lista de emails
+                        } else {
+                            alert(resultado.erro || 'Erro ao importar emails.');
+                        }
+                    } catch (erro) {
+                        alert('Erro ao conectar com o servidor.');
+                    }
+                }
             });
+
         </script>
     </body>
 
