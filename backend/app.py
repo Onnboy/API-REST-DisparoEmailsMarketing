@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from config import get_db_connection
-from backend.routes import blueprint as routes
+from backend.config import get_db_connection
+from backend.routes.routes import blueprint as routes
 
 app = Flask(__name__)
 CORS(app)

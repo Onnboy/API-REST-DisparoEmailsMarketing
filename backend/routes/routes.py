@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from config import get_db_connection
+from backend.config import get_db_connection
 
 blueprint = Blueprint('api', __name__)
 
@@ -37,13 +37,17 @@ def add_email():
 # Rota para remover um email pelo ID
 @blueprint.route('/emails/<int:id>', methods=['DELETE'])
 def delete_email(id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("DELETE FROM emails WHERE id = %s", (id,))
-    connection.commit()
-    cursor.close()
-    connection.close()
-    return jsonify({'message': 'Email removido com sucesso!'})
+    try:
+        with get_db_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM emails WHERE id = %s", (id,))
+                if cursor.rowcount == 0:
+                    return jsonify({'error': 'Nenhum email encontrado com esse ID'}), 404
+                connection.commit()
+        return jsonify({'message': 'Email removido com sucesso!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Rota para listar todas as campanhas
 @blueprint.route('/campanhas', methods=['GET'])
@@ -86,13 +90,15 @@ def add_campanha():
 # Rota para remover uma campanha pelo ID
 @blueprint.route('/campanhas/<int:id>', methods=['DELETE'])
 def delete_campanha(id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("DELETE FROM campanhas WHERE id = %s", (id,))
-    connection.commit()
-    cursor.close()
-    connection.close()
-    return jsonify({'message': 'Campanha removida com sucesso!'})
+    try:
+        with get_db_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM campanhas WHERE id = %s", (id,))
+                connection.commit()
+        return jsonify({'message': 'Campanha removida com sucesso!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Rota para listar todos os envios de emails
 @blueprint.route('/envios', methods=['GET'])
