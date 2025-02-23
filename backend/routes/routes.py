@@ -67,7 +67,7 @@ def add_campanha():
     titulo = data.get('titulo')
     mensagem = data.get('mensagem')
     data_envio = data.get('data_envio')
-    frequencia = data.get('frequencia', 'único')  # Padrão: campanha única
+    frequencia = data.get('frequencia', 'único')
 
     if not titulo or not mensagem or not data_envio:
         return jsonify({'error': 'Título, mensagem e data de envio são obrigatórios'}), 400
@@ -122,7 +122,7 @@ def add_envio():
     data = request.get_json()
     email_id = data.get('email_id')
     campanha_id = data.get('campanha_id')
-    status = data.get('status', 'sucesso')  # Padrão: sucesso
+    status = data.get('status', 'sucesso') 
 
     if not email_id or not campanha_id:
         return jsonify({'error': 'Email ID e Campanha ID são obrigatórios'}), 400
