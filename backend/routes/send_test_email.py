@@ -11,4 +11,5 @@ def send_test_email():
     if response == 202:
         return jsonify({"message": "E-mail enviado com sucesso!"}), 200
     else:
+        print(f"Erro ao enviar e-mail: Código {response}") # Plano B se necessario for
         return jsonify({"error": "Falha ao enviar e-mail"}), 500
