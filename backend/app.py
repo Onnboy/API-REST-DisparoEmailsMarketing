@@ -1,30 +1,13 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-from backend.config import get_db_connection
-from backend.routes.routes import blueprint as routes
+from flask import Flask
+from backend.routes.routes import register_routes
+from backend.routes.send_test_email import sendtestemail_bp 
 
 app = Flask(__name__)
-CORS(app)
 
-# Registrando as rotas no Flask
-app.register_blueprint(routes)
+app.register_blueprint(sendtestemail_bp)
 
-# Rota de teste da conexão com MySQL
-@app.route('/db-test', methods=['GET'])
-def db_test():
-    connection = get_db_connection()
-    if connection:
-        try:
-            cursor = connection.cursor()
-            cursor.execute("SELECT DATABASE();")
-            db_name = cursor.fetchone()[0]
-            cursor.close()
-            connection.close()
-            return jsonify({'message': f'Conectado ao banco de dados: {db_name}'})
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
-    else:
-        return jsonify({'error': 'Falha na conexão com o banco de dados'}), 500
+# Registrando todas as rotas no app
+register_routes(app)
 
 if __name__ == '__main__':
     app.run(debug=True)
