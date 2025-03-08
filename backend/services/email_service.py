@@ -1,37 +1,49 @@
 import os
-import sendgrid
-from sendgrid.helpers.mail import Mail
+import sib_api_v3_sdk
+from backend.config import get_db_connection
+from sib_api_v3_sdk.rest import ApiException
 from dotenv import load_dotenv
 
-# Carrega as variáveis do .env
 load_dotenv()
 
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-SENDGRID_DEFAULT_SENDER = os.getenv("SENDGRID_DEFAULT_SENDER")
+API_KEY = os.getenv("SENDINBLUE_API_KEY")
+DEFAULT_SENDER = os.getenv("SENDINBLUE_DEFAULT_SENDER")
 
-# Debug: Verifica se as chaves foram carregadas corretamente
-print(f"Debug: Chave SendGrid carregada? {bool(SENDGRID_API_KEY)}")
-print(f"Debug: Email remetente padrão? {SENDGRID_DEFAULT_SENDER}")
+configuration = sib_api_v3_sdk.Configuration()
+configuration.api_key['api-key'] = API_KEY
 
-if not SENDGRID_API_KEY:
-    raise ValueError("ERRO: A chave SENDGRID_API_KEY não foi carregada!")
+api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
-if not SENDGRID_DEFAULT_SENDER:
-    raise ValueError("ERRO: O remetente padrão SENDGRID_DEFAULT_SENDER não foi carregado!")
+def send_email(to_email, subject, content, campanha_id=None):
+    sender = {"name": "Meu Nome", "email": DEFAULT_SENDER}
+    recipient = [{"email": to_email}]
 
-sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
-
-def send_email(to_email, subject, content):
-    message = Mail(
-        from_email=SENDGRID_DEFAULT_SENDER,
-        to_emails=to_email,
+    email = sib_api_v3_sdk.SendSmtpEmail(
+        sender=sender,
+        to=recipient,
         subject=subject,
         html_content=content
     )
+
     try:
-        response = sg.send(message)
-        print(f"Debug: Resposta SendGrid {response.status_code}")
-        return response.status_code
-    except Exception as e:
+        sucesso = api_instance.send_transac_email(email)
+        if sucesso and campanha_id is not None:
+            atualizar_taxa_entrega(campanha_id)
+        return True  
+    except ApiException as e:
         print(f"Erro ao enviar e-mail: {e}")
-        return str(e)
+        return False 
+
+def atualizar_taxa_entrega(campanha_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        UPDATE campanhas 
+        SET taxa_entrega = taxa_entrega + 1
+        WHERE id = %s
+    """, (campanha_id,))
+
+    connection.commit()
+    cursor.close()
+    connection.close()

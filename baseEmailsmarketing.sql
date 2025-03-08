@@ -7,6 +7,8 @@ CREATE TABLE emails (
     nome VARCHAR(100) NOT NULL,
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+#SET foreign_key_checks = 1;
+#DROP TABLE emails;
 
 CREATE TABLE campanhas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,6 +17,8 @@ CREATE TABLE campanhas (
     data_envio DATETIME NOT NULL,
     status ENUM('pendente', 'enviado', 'cancelado') DEFAULT 'pendente'
 );
+#SET foreign_key_checks = 1;
+#DROP TABLE campanhas;
 
 CREATE TABLE envios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,6 +29,8 @@ CREATE TABLE envios (
     FOREIGN KEY (email_id) REFERENCES emails(id) ON DELETE CASCADE,
     FOREIGN KEY (campanha_id) REFERENCES campanhas(id) ON DELETE CASCADE
 );
+#SET foreign_key_checks = 1;
+#DROP TABLE envios;
 
 
 CREATE TABLE interacoes (
@@ -34,6 +40,8 @@ CREATE TABLE interacoes (
     data_interacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (envio_id) REFERENCES envios(id) ON DELETE CASCADE
 );
+#SET foreign_key_checks = 1;
+#DROP TABLE interacoes;
 
 #INSERT INTO emails (email, nome)
 #VALUES ('teste@gmail.com', 'Usuario Ghost');
@@ -45,4 +53,9 @@ CREATE TABLE interacoes (
 #ALTER TABLE campanhas AUTO_INCREMENT = 1;
 
 #ALTER TABLE campanhas ADD COLUMN email VARCHAR(255) NOT NULL;
+#ALTER TABLE envios MODIFY COLUMN status ENUM('sucesso', 'falha', 'pendente') DEFAULT 'pendente';
+#SELECT * FROM emails WHERE id = 1;
+#INSERT INTO emails (id, email, nome, data_cadastro, categoria) 
+#VALUES (1, 'teste@email.com', 'Teste', NOW(), 'Marketing');
+
 
