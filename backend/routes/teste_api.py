@@ -59,6 +59,11 @@ def testar_atualizacao_email():
 
     time.sleep(1)
 
+def testar_listagem_campanhas():
+    print("\n🔹 Testando listagem de campanhas...")
+    resposta = requests.get(f"{BASE_URL}/campanhas")
+    exibir_resposta(resposta, sucesso_msg="Lista de campanhas obtida com sucesso!")
+
 def testar_remocao_email():
     print("\n🔹 Testando remoção de e-mail...")
 
@@ -138,30 +143,32 @@ def testar_exportacao_csv():
 
     try:
         resposta = requests.get(f"{BASE_URL}/relatorios/export?formato=csv")
-        
+
         if resposta.status_code == 200 and resposta.headers.get("Content-Type") == "text/csv":
-            print("✅ Exportação de CSV bem-sucedida!")
+            with open("relatorio.csv", "wb") as f:
+                f.write(resposta.content)
+            print("✅ Exportação de CSV bem-sucedida! Arquivo salvo como 'relatorio.csv'.")
         else:
             print(f"❌ Erro na exportação de CSV: {resposta.status_code}")
+
     except Exception as e:
         print(f"❌ Erro ao exportar CSV: {e}")
-
-    time.sleep(1)
 
 def testar_exportacao_pdf():
     print("\n🔹 Testando exportação de relatório em PDF...")
 
     try:
         resposta = requests.get(f"{BASE_URL}/relatorios/export?formato=pdf")
-        
+
         if resposta.status_code == 200 and resposta.headers.get("Content-Type") == "application/pdf":
-            print("✅ Exportação de PDF bem-sucedida!")
+            with open("relatorio.pdf", "wb") as f:
+                f.write(resposta.content)
+            print("✅ Exportação de PDF bem-sucedida! Arquivo salvo como 'relatorio.pdf'.")
         else:
             print(f"❌ Erro na exportação de PDF: {resposta.status_code}")
+
     except Exception as e:
         print(f"❌ Erro ao exportar PDF: {e}")
-
-    time.sleep(1)
 
 def testar_envio_email_template():
     print("\n🔹 Testando envio de e-mail com template...")
@@ -204,6 +211,7 @@ if __name__ == "__main__":
     testar_listagem_emails()
     testar_atualizacao_email()
     testar_remocao_email()
+    testar_listagem_campanhas()
     testar_agendamento_envio()
     testar_registro_envio()
     testar_registro_abertura()
