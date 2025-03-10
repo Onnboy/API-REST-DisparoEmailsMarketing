@@ -9,9 +9,9 @@ def send_test_email():
     """Envia um e-mail de teste."""
     if request.method == "POST":
         dados = request.json
-        destinatario = dados.get("email", "jonasalberto.dev@gmail.com")  
+        destinatario = dados.get("email", "bomfimsantarosa@gmail.com")  
     else:
-        destinatario = "jonasalberto.dev@gmail.com"
+        destinatario = "bomfimsantarosa@gmail.com"
 
     sucesso = send_email(destinatario, "Teste", "<h1>Este é um e-mail de teste!</h1>")
     

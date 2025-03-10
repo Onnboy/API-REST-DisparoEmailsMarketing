@@ -26,12 +26,9 @@ def agendar_envio():
                        (dados['data_envio'], dados['campanha_id']))
         connection.commit()
 
-        print(f"✅ Envio agendado para {dados['data_envio']}")
-
         return jsonify({"message": "Envio agendado com sucesso!"}), 200
 
     except Exception as e:
-        print(f"❌ Erro ao agendar envio: {e}")
         return jsonify({"error": f"Erro ao agendar envio: {str(e)}"}), 500
 
     finally:

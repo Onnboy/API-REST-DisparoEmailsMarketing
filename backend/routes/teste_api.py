@@ -7,14 +7,22 @@ BASE_URL = "http://127.0.0.1:5000"
 def testar_criacao_email():
     print("\n🔹 Testando criação de e-mail...")
     dados = {"email": f"teste{random.randint(1000,9999)}@gmail.com", "nome": "Usuário Teste"}
-    
     try:
         resposta = requests.post(f"{BASE_URL}/emails", json=dados)
-        print(resposta.json())
+        exibir_resposta(resposta, sucesso_msg="E-mail criado com sucesso!")
     except Exception as e:
         print(f"❌ Erro ao criar e-mail: {e}")
-
     time.sleep(1)
+
+def exibir_resposta(resposta, sucesso_msg="", erro_msg="❌ Ocorreu um erro"):
+    try:
+        if resposta.ok:
+            print(f"✅ {sucesso_msg}" if sucesso_msg else resposta.json())
+        else:
+            print(f"{erro_msg}: {resposta.status_code} - {resposta.text}")
+    except requests.exceptions.JSONDecodeError:
+        print(f"{erro_msg}: Resposta não é um JSON válido. Status: {resposta.status_code}")
+
 
 def testar_listagem_emails():
     print("\n🔹 Testando listagem de e-mails...")
@@ -84,31 +92,23 @@ def testar_agendamento_envio():
 def testar_registro_envio():
     print("\n🔹 Testando registro de envio...")
 
-    resposta = requests.get(f"{BASE_URL}/campanhas")
-    campanhas = resposta.json()
-
-    if not isinstance(campanhas, list) or not campanhas:
+    resposta_campanhas = requests.get(f"{BASE_URL}/campanhas")
+    campanhas = resposta_campanhas.json() if resposta_campanhas.ok else []
+    if not campanhas:
         print("❌ Nenhuma campanha encontrada. Teste cancelado.")
         return
-    
-    campanha_id = campanhas[0]["id"]
 
-    resposta = requests.get(f"{BASE_URL}/emails")
-    emails = resposta.json()
-
-    if not isinstance(emails, list) or not emails:
+    resposta_emails = requests.get(f"{BASE_URL}/emails")
+    emails = resposta_emails.json() if resposta_emails.ok else []
+    if not emails:
         print("❌ Nenhum e-mail encontrado. Teste cancelado.")
         return
-    
-    email_id = emails[0]["id"]
 
-    dados = {"campanha_id": campanha_id, "email_id": email_id}
+    dados = {"campanha_id": campanhas[0]["id"], "email_id": emails[0]["id"]}
     resposta = requests.post(f"{BASE_URL}/envios", json=dados)
+    exibir_resposta(resposta, sucesso_msg="Envio registrado com sucesso!")
+    time.sleep(1)
 
-    try:
-        print(resposta.json())
-    except requests.exceptions.JSONDecodeError:
-        print(f"❌ Erro: A resposta da API está vazia. Status {resposta.status_code}")
 
 def testar_registro_abertura():
     print("\n🔹 Testando registro de abertura...")
@@ -163,16 +163,53 @@ def testar_exportacao_pdf():
 
     time.sleep(1)
 
+def testar_envio_email_template():
+    print("\n🔹 Testando envio de e-mail com template...")
+    dados = {
+        "email": "teste@email.com",
+        "subject": "Promoção Exclusiva!",
+        "content": "<h1>Olá, {{ nome }}!</h1><p>Aproveite nossa promoção exclusiva.</p>"
+    }
+
+    try:
+        resposta = requests.post(f"{BASE_URL}/send-email-template", json=dados)
+        print(resposta.json())
+    except Exception as e:
+        print(f"❌ Erro ao enviar e-mail com template: {e}")
+
+    time.sleep(1)
+
+def testar_envio_email_com_anexo():
+    print("\n🔹 Testando envio de e-mail com anexo...")
+
+    dados = {
+        "email": "teste@email.com",
+        "subject": "Comprovante de Compra",
+        "content": "<h1>Olá!</h1><p>Segue seu comprovante em anexo.</p>",
+        "attachments": [
+            {"name": "comprovante.pdf", "path": "arquivos/comprovante.pdf"}
+        ]
+    }
+
+    try:
+        resposta = requests.post(f"{BASE_URL}/send-email-template", json=dados)
+        print(resposta.json())
+    except Exception as e:
+        print(f"❌ Erro ao enviar e-mail com anexo: {e}")
+
+    time.sleep(1)
 
 if __name__ == "__main__":
-    testar_exportacao_csv()
-    testar_exportacao_pdf()
-    testar_registro_abertura()
-    testar_registro_clique()
     testar_criacao_email()
     testar_listagem_emails()
     testar_atualizacao_email()
     testar_remocao_email()
     testar_agendamento_envio()
     testar_registro_envio()
+    testar_registro_abertura()
+    testar_registro_clique()
     testar_obter_relatorio()
+    testar_exportacao_csv()
+    testar_exportacao_pdf()
+    testar_envio_email_template()
+    testar_envio_email_com_anexo()

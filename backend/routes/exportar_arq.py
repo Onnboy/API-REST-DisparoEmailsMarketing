@@ -16,27 +16,31 @@ def gerar_pdf():
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT id, titulo, taxa_entrega, taxa_abertura, taxa_cliques FROM campanhas")
-    campanhas = cursor.fetchall()
+    try:
+        cursor.execute("SELECT id, titulo, taxa_entrega, taxa_abertura, taxa_cliques FROM campanhas")
+        campanhas = cursor.fetchall()
 
-    y_position = height - 50  
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(150, y_position, "Relatório de Campanhas de E-mail Marketing")
-    y_position -= 30
+        y_position = height - 50
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(150, y_position, "Relatório de Campanhas de E-mail Marketing")
+        y_position -= 30
 
-    c.setFont("Helvetica", 12)
-    for campanha in campanhas:
-        c.drawString(50, y_position, f"ID: {campanha[0]}")
-        c.drawString(150, y_position, f"Título: {campanha[1]}")
-        c.drawString(350, y_position, f"Entrega: {campanha[2]}%")
-        y_position -= 20
-        c.drawString(150, y_position, f"Abertura: {campanha[3]}%")
-        c.drawString(350, y_position, f"Cliques: {campanha[4]}%")
-        y_position -= 30  
+        c.setFont("Helvetica", 12)
+        for campanha in campanhas:
+            c.drawString(50, y_position, f"ID: {campanha[0]}")
+            c.drawString(150, y_position, f"Título: {campanha[1]}")
+            c.drawString(350, y_position, f"Entrega: {campanha[2]}%")
+            y_position -= 20
+            c.drawString(150, y_position, f"Abertura: {campanha[3]}%")
+            c.drawString(350, y_position, f"Cliques: {campanha[4]}%")
+            y_position -= 30  
 
-        if y_position < 50:  
-            c.showPage()
-            y_position = height - 50  
+            if y_position < 50:  
+                c.showPage()
+                y_position = height - 50  
+    finally:
+        cursor.close()
+        connection.close()
 
     c.save()
     buffer.seek(0)

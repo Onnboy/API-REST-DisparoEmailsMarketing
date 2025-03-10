@@ -101,14 +101,12 @@ def remover_email(id):
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    # Verifica se o e-mail existe
     cursor.execute("SELECT id FROM emails WHERE id = %s", (id,))
     if not cursor.fetchone():
         cursor.close()
         connection.close()
-        return jsonify({"error": "E-mail não encontrado"}), 404
+        return jsonify({"error": "E-mail não encontrado!"}), 404
 
-    # Remove o e-mail
     cursor.execute("DELETE FROM emails WHERE id = %s", (id,))
     connection.commit()
 

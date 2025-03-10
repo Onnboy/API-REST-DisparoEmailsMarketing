@@ -1,49 +1,44 @@
+import requests
 import os
-import sib_api_v3_sdk
-from backend.config import get_db_connection
-from sib_api_v3_sdk.rest import ApiException
-from dotenv import load_dotenv
+from backend.config import SENDINBLUE_API_KEY, SENDINBLUE_DEFAULT_SENDER
+import base64
 
-load_dotenv()
+def send_email(destinatario, assunto, conteudo, attachments=None):
+    url = "https://api.sendinblue.com/v3/smtp/email"
+    headers = {
+        "api-key": SENDINBLUE_API_KEY,
+        "Content-Type": "application/json",
+    }
 
-API_KEY = os.getenv("SENDINBLUE_API_KEY")
-DEFAULT_SENDER = os.getenv("SENDINBLUE_DEFAULT_SENDER")
+    data = {
+        "sender": {"name": "Seu Nome", "email": SENDINBLUE_DEFAULT_SENDER},
+        "to": [{"email": destinatario}],
+        "subject": assunto,
+        "htmlContent": conteudo,
+    }
 
-configuration = sib_api_v3_sdk.Configuration()
-configuration.api_key['api-key'] = API_KEY
+    # Processar anexos
+    if attachments:
+        anexos_base64 = []
+        for attachment in attachments:
+            file_path = attachment.get("caminho")  # <- pega o caminho correto
+            if file_path and os.path.exists(file_path):
+                with open(file_path, "rb") as file:
+                    encoded_content = base64.b64encode(file.read()).decode("utf-8")
+                    nome_arquivo = os.path.basename(file_path)
+                    anexos_base64.append({
+                        "name": nome_arquivo,
+                        "content": encoded_content
+                    })
+        if anexos_base64:
+            data["attachment"] = anexos_base64
 
-api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-
-def send_email(to_email, subject, content, campanha_id=None):
-    sender = {"name": "Meu Nome", "email": DEFAULT_SENDER}
-    recipient = [{"email": to_email}]
-
-    email = sib_api_v3_sdk.SendSmtpEmail(
-        sender=sender,
-        to=recipient,
-        subject=subject,
-        html_content=content
-    )
-
+    response = requests.post(url, headers=headers, json=data)
+    
     try:
-        sucesso = api_instance.send_transac_email(email)
-        if sucesso and campanha_id is not None:
-            atualizar_taxa_entrega(campanha_id)
-        return True  
-    except ApiException as e:
-        print(f"Erro ao enviar e-mail: {e}")
-        return False 
-
-def atualizar_taxa_entrega(campanha_id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        UPDATE campanhas 
-        SET taxa_entrega = taxa_entrega + 1
-        WHERE id = %s
-    """, (campanha_id,))
-
-    connection.commit()
-    cursor.close()
-    connection.close()
+        response.raise_for_status()  # Vai lançar erro se status != 200
+        return True  # sucesso
+    except requests.exceptions.RequestException as e:
+        print("Erro ao enviar e-mail:", e)
+        print("Resposta:", response.text)  # para depurar o erro da API
+        return False  # falhou

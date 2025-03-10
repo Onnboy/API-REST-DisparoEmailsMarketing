@@ -11,3 +11,6 @@ def get_db_connection():
         password=os.getenv("DB_PASSWORD", "71208794"),
         database=os.getenv("DB_NAME", "base_emails_marketing")
     )
+
+SENDINBLUE_API_KEY = os.getenv("SENDINBLUE_API_KEY")
+SENDINBLUE_DEFAULT_SENDER = os.getenv("SENDINBLUE_DEFAULT_SENDER")
