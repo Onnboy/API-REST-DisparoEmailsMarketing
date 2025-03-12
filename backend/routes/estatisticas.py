@@ -62,11 +62,17 @@ def registrar_abertura():
         SET taxa_abertura = taxa_abertura + 1
         WHERE id = %s
     """, (campanha_id,))
+    affected_rows = cursor.rowcount
     connection.commit()
-    
+
     cursor.close()
     connection.close()
+
+    if affected_rows == 0:
+        return jsonify({"error": "Campanha não encontrada"}), 404
+
     return jsonify({"message": "Abertura registrada com sucesso!"}), 200
+
 
 @estatisticas_bp.route('/clique', methods=['POST'])
 @swag_from({
