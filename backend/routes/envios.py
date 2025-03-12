@@ -5,6 +5,35 @@ from flasgger import swag_from
 envios_bp = Blueprint('envios', __name__)
 
 @envios_bp.route('/envios', methods=['GET'])
+@swag_from({
+    "tags": ["Envios"],
+    "summary": "Listar todos os envios de e-mails",
+    "description": "Lista todos os envios registrados, com detalhes de campanha e destinatário.",
+    "responses": {
+        200: {
+            "description": "Lista de envios encontrados",
+            "schema": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer", "example": 1},
+                        "campanha_id": {"type": "integer", "example": 2},
+                        "campanha_titulo": {"type": "string", "example": "Campanha Promocional"},
+                        "email_id": {"type": "integer", "example": 5},
+                        "email": {"type": "string", "example": "cliente@email.com"},
+                        "status": {"type": "string", "example": "pendente"},
+                        "data_envio": {"type": "string", "example": "2025-03-10 10:00:00"}
+                    }
+                }
+            }
+        },
+        404: {
+            "description": "Nenhum envio encontrado",
+            "schema": {"type": "object", "properties": {"message": {"type": "string"}}}
+        }
+    }
+})
 def listar_envios():
     """Lista todos os envios de e-mails registrados."""
     connection = get_db_connection()
@@ -40,7 +69,7 @@ def listar_envios():
 @swag_from({
     "tags": ["Envios"],
     "summary": "Registrar envio de e-mail",
-    "description": "Registra um envio de e-mail para uma campanha.",
+    "description": "Registra um envio de e-mail vinculado a uma campanha específica e destinatário.",
     "parameters": [
         {
             "name": "body",
@@ -49,30 +78,29 @@ def listar_envios():
             "schema": {
                 "type": "object",
                 "properties": {
-                    "campanha_id": {"type": "integer"},
-                    "email_id": {"type": "integer"}
-                }
+                    "campanha_id": {"type": "integer", "example": 1},
+                    "email_id": {"type": "integer", "example": 10}
+                },
+                "required": ["campanha_id", "email_id"]
             }
         }
     ],
     "responses": {
         201: {
-            "description": "Envio registrado com sucesso!",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "message": {"type": "string"}
-                }
-            }
+            "description": "Envio registrado com sucesso",
+            "schema": {"type": "object", "properties": {"message": {"type": "string"}}}
         },
         400: {
-            "description": "Erro na requisição",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "error": {"type": "string"}
-                }
-            }
+            "description": "Campos obrigatórios ausentes",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
+        },
+        404: {
+            "description": "Campanha ou e-mail não encontrados",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
+        },
+        409: {
+            "description": "E-mail já enviado para essa campanha",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
         }
     }
 })

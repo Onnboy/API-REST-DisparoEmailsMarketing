@@ -1,9 +1,52 @@
 from flask import Blueprint, request, jsonify
 from backend.config import get_db_connection
+from flasgger import swag_from
 
 estatisticas_bp = Blueprint('estatisticas', __name__)
 
 @estatisticas_bp.route('/abertura', methods=['POST'])
+@swag_from({
+    "tags": ["Estatísticas"],
+    "summary": "Registrar abertura de e-mail",
+    "description": "Incrementa a taxa de abertura da campanha informada.",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "required": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "campanha_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "required": ["campanha_id"]
+            }
+        }
+    ],
+    "responses": {
+        200: {
+            "description": "Abertura registrada com sucesso",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "message": {"type": "string", "example": "Abertura registrada com sucesso!"}
+                }
+            }
+        },
+        400: {
+            "description": "Campo obrigatório não informado",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "error": {"type": "string", "example": "O campo 'campanha_id' é obrigatório!"}
+                }
+            }
+        }
+    }
+})
 def registrar_abertura():
     dados = request.json
     campanha_id = dados.get('campanha_id')
@@ -26,6 +69,48 @@ def registrar_abertura():
     return jsonify({"message": "Abertura registrada com sucesso!"}), 200
 
 @estatisticas_bp.route('/clique', methods=['POST'])
+@swag_from({
+    "tags": ["Estatísticas"],
+    "summary": "Registrar clique em e-mail",
+    "description": "Incrementa a taxa de cliques da campanha informada.",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "required": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "campanha_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "required": ["campanha_id"]
+            }
+        }
+    ],
+    "responses": {
+        200: {
+            "description": "Clique registrado com sucesso",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "message": {"type": "string", "example": "Clique registrado com sucesso!"}
+                }
+            }
+        },
+        400: {
+            "description": "Campo obrigatório não informado",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "error": {"type": "string", "example": "O campo 'campanha_id' é obrigatório!"}
+                }
+            }
+        }
+    }
+})
 def registrar_clique():
     dados = request.json
     campanha_id = dados.get('campanha_id')
