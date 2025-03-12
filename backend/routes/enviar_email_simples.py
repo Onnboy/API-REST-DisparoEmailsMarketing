@@ -4,7 +4,7 @@ from backend.services.email_service import send_email
 
 sendemail_simple_bp = Blueprint('sendemail_simple', __name__)
 
-@sendemail_simple_bp.route("/send-email", methods=["GET", "POST"])
+@sendemail_simple_bp.route("/send-email", methods=["POST"])
 @swag_from({
     "tags": ["Envio de E-mails"],
     "summary": "Enviar e-mail simples",

@@ -127,6 +127,14 @@ def registrar_clique():
     connection = get_db_connection()
     cursor = connection.cursor()
 
+    cursor.execute("SELECT id FROM campanhas WHERE id = %s", (campanha_id,))
+    campanha = cursor.fetchone()
+
+    if not campanha:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "Campanha não encontrada"}), 404
+
     cursor.execute("""
         UPDATE campanhas 
         SET taxa_cliques = taxa_cliques + 1
@@ -136,4 +144,5 @@ def registrar_clique():
     
     cursor.close()
     connection.close()
+
     return jsonify({"message": "Clique registrado com sucesso!"}), 200

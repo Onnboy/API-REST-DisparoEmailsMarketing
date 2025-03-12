@@ -134,6 +134,7 @@ def listar_templates():
     "responses": {
         200: {"description": "Template atualizado com sucesso."},
         400: {"description": "Erro de validação."},
+        404: {"description": "ID não encontrado."},
         500: {"description": "Erro interno."}
     }
 })
@@ -147,6 +148,15 @@ def atualizar_template(id):
 
     connection = get_db_connection()
     cursor = connection.cursor()
+
+    # Verificar se o ID existe
+    cursor.execute("SELECT * FROM templates WHERE id = %s", (id,))
+    resultado = cursor.fetchone()
+
+    if not resultado:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "ID não encontrado"}), 404
 
     try:
         campos = []
@@ -188,12 +198,21 @@ def atualizar_template(id):
     ],
     "responses": {
         200: {"description": "Template removido com sucesso."},
+        400: {"description": "ID não encontrado."},
         500: {"description": "Erro interno."}
     }
 })
 def remover_template(id):
     connection = get_db_connection()
     cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM templates WHERE id = %s", (id,))
+    resultado = cursor.fetchone()
+
+    if not resultado:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "ID não encontrado"}), 400
 
     try:
         cursor.execute("DELETE FROM templates WHERE id = %s", (id,))

@@ -4,7 +4,7 @@ from flasgger import swag_from
 
 sendemail_template_bp = Blueprint('sendemail_template', __name__)
 
-@sendemail_template_bp.route("/send-email-template", methods=["GET", "POST"])
+@sendemail_template_bp.route("/send-email-template", methods=["POST"])
 @swag_from({
     "tags": ["Envio de E-mails"],
     "summary": "Enviar e-mail simples",

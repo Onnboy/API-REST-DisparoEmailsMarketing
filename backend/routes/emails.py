@@ -13,7 +13,7 @@ def email_valido(email):
 @emails_bp.route('/emails', methods=['POST'])
 @swag_from({
     "tags": ["E-mails"],
-    "summary": "Cadastrar novo e-mail",
+    "summary": "Cadastrar e-mail",
     "description": "Cadastra um novo e-mail na lista, com nome associado.",
     "parameters": [
         {
@@ -138,6 +138,7 @@ def listar_emails():
     "responses": {
         200: {"description": "E-mail atualizado com sucesso"},
         400: {"description": "Dados inválidos ou formato incorreto"},
+        404: {"description": "ID não encontrado"},
         500: {"description": "Erro interno ao atualizar"}
     }
 })
@@ -149,6 +150,14 @@ def atualizar_email(id):
 
     connection = get_db_connection()
     cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM emails WHERE id = %s", (id,))
+    resultado = cursor.fetchone()
+
+    if not resultado:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "ID não encontrado"}), 404
 
     campos_para_atualizar = []
     valores = []
