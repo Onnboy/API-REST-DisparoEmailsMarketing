@@ -9,6 +9,7 @@ from backend.routes.enviar_email_simples import sendemail_simple_bp
 from backend.routes.exportar_arq import exportar_bp
 from backend.routes.enviar_email_template import sendemail_template_bp
 from backend.routes.templates import templates_bp
+from backend.routes.enviar_status import update_status_bp
 from flask import Blueprint
 
 main_bp = Blueprint('main_bp', __name__)
@@ -28,3 +29,4 @@ def register_routes(app: Flask):
     app.register_blueprint(exportar_bp)
     app.register_blueprint(sendemail_template_bp)
     app.register_blueprint(templates_bp)
+    app.register_blueprint(update_status_bp)

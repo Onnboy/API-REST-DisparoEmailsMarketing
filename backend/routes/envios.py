@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from backend.config import get_db_connection
 from flasgger import swag_from
+import logging
 
 envios_bp = Blueprint('envios', __name__)
+logging.basicConfig(level=logging.INFO)
 
 @envios_bp.route('/envios', methods=['GET'])
 @swag_from({
@@ -143,3 +145,87 @@ def registrar_envio():
     connection.close()
 
     return jsonify({"message": "Envio registrado com sucesso!"}), 201
+
+@envios_bp.route('/envios/status', methods=['PUT'])
+@swag_from({
+    "tags": ["Envios"],
+    "summary": "Atualizar status do envio",
+    "description": "Atualiza o status de um e-mail enviado dentro de uma campanha específica.",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "required": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "campanha_id": {"type": "integer", "example": 1},
+                    "email_id": {"type": "integer", "example": 10},
+                    "status": {"type": "string", "example": "enviado"}
+                },
+                "required": ["campanha_id", "email_id", "status"]
+            }
+        }
+    ],
+    "responses": {
+        200: {
+            "description": "Status atualizado com sucesso",
+            "schema": {"type": "object", "properties": {"message": {"type": "string"}}}
+        },
+        400: {
+            "description": "Dados inválidos",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
+        },
+        404: {
+            "description": "Registro não encontrado",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
+        },
+        500: {
+            "description": "Erro interno",
+            "schema": {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
+    }
+})
+def atualizar_status_envio():
+    """Atualiza o status de um envio específico baseado na campanha e no e-mail."""
+    dados = request.json
+    campanha_id = dados.get('campanha_id')
+    email_id = dados.get('email_id')
+    status = dados.get('status')
+
+    status_permitidos = ['pendente', 'enviado', 'erro']
+
+    if not campanha_id or not email_id or not status:
+        return jsonify({"error": "Campos 'campanha_id', 'email_id' e 'status' são obrigatórios."}), 400
+
+    if status not in status_permitidos:
+        return jsonify({"error": f"Status inválido. Permitidos: {', '.join(status_permitidos)}."}), 400
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT id FROM envios WHERE campanha_id = %s AND email_id = %s
+        """, (campanha_id, email_id))
+        registro = cursor.fetchone()
+
+        if not registro:
+            return jsonify({"error": "Registro de envio não encontrado."}), 404
+
+        cursor.execute("""
+            UPDATE envios
+            SET status = %s
+            WHERE campanha_id = %s AND email_id = %s
+        """, (status, campanha_id, email_id))
+        connection.commit()
+
+        return jsonify({"message": "Status atualizado com sucesso."}), 200
+
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"error": f"Erro ao atualizar o status: {str(e)}"}), 500
+
+    finally:
+        cursor.close()
+        connection.close()

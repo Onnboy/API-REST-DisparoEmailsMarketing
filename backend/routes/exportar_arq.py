@@ -9,7 +9,7 @@ from flasgger import swag_from
 
 exportar_bp = Blueprint('exportar', __name__)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RELATORIOS_DIR = os.path.join(BASE_DIR, "relatorios")
 
 os.makedirs(RELATORIOS_DIR, exist_ok=True)
