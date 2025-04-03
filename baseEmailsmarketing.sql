@@ -32,16 +32,33 @@ CREATE TABLE envios (
 #SET foreign_key_checks = 1;
 #DROP TABLE envios;
 
+DROP TABLE IF EXISTS interacoes;
 
 CREATE TABLE interacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     envio_id INT,
-    tipo ENUM('abertura', 'clique', 'resposta'),
+    email_id INT,
+    tipo ENUM('abertura', 'clique', 'resposta', 'conversao') NOT NULL,
     data_interacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (envio_id) REFERENCES envios(id) ON DELETE CASCADE
+    detalhes JSON,
+    url_clicada VARCHAR(255),
+    user_agent VARCHAR(255),
+    ip_address VARCHAR(45),
+    FOREIGN KEY (envio_id) REFERENCES envios(id) ON DELETE CASCADE,
+    FOREIGN KEY (email_id) REFERENCES emails(id) ON DELETE CASCADE
 );
 #SET foreign_key_checks = 1;
 #DROP TABLE interacoes;
+
+CREATE TABLE webhook_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('crm', 'automacao', 'analytics') NOT NULL,
+    acao VARCHAR(100) NOT NULL,
+    dados JSON,
+    data_recebimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('processado', 'erro') DEFAULT 'processado',
+    erro_detalhes TEXT
+);
 
 #INSERT INTO emails (email, nome)
 #VALUES ('teste@gmail.com', 'Usuario Ghost');

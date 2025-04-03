@@ -6,7 +6,7 @@ import logging
 envios_bp = Blueprint('envios', __name__)
 logging.basicConfig(level=logging.INFO)
 
-@envios_bp.route('/envios', methods=['GET'])
+@envios_bp.route('/', methods=['GET'])
 @swag_from({
     "tags": ["Envios"],
     "summary": "Listar todos os envios de e-mails",
@@ -67,7 +67,7 @@ def listar_envios():
         } for e in envios
     ]), 200
 
-@envios_bp.route('/envios', methods=['POST'])
+@envios_bp.route('/', methods=['POST'])
 @swag_from({
     "tags": ["Envios"],
     "summary": "Registrar envio de e-mail",
@@ -146,7 +146,7 @@ def registrar_envio():
 
     return jsonify({"message": "Envio registrado com sucesso!"}), 201
 
-@envios_bp.route('/envios/status', methods=['PUT'])
+@envios_bp.route('/status', methods=['PUT'])
 @swag_from({
     "tags": ["Envios"],
     "summary": "Atualizar status do envio",
