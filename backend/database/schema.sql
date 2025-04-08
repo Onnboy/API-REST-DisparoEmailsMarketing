@@ -1,8 +1,6 @@
--- Criar banco de dados
 CREATE DATABASE IF NOT EXISTS base_emails_marketing;
 USE base_emails_marketing;
 
--- Tabela de contatos
 CREATE TABLE IF NOT EXISTS contatos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -12,7 +10,6 @@ CREATE TABLE IF NOT EXISTS contatos (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de templates
 CREATE TABLE IF NOT EXISTS templates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -23,7 +20,6 @@ CREATE TABLE IF NOT EXISTS templates (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de segmentos
 CREATE TABLE IF NOT EXISTS segmentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -33,7 +29,6 @@ CREATE TABLE IF NOT EXISTS segmentos (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de contatos por segmento
 CREATE TABLE IF NOT EXISTS contatos_segmentos (
     contato_id INT NOT NULL,
     segmento_id INT NOT NULL,
@@ -43,7 +38,6 @@ CREATE TABLE IF NOT EXISTS contatos_segmentos (
     FOREIGN KEY (segmento_id) REFERENCES segmentos(id) ON DELETE CASCADE
 );
 
--- Tabela de campanhas
 CREATE TABLE IF NOT EXISTS campanhas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
@@ -57,7 +51,6 @@ CREATE TABLE IF NOT EXISTS campanhas (
     FOREIGN KEY (segmento_id) REFERENCES segmentos(id) ON DELETE SET NULL
 );
 
--- Tabela de agendamentos
 CREATE TABLE IF NOT EXISTS agendamentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     template_id INT NOT NULL,
@@ -72,7 +65,6 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     FOREIGN KEY (segmento_id) REFERENCES segmentos(id) ON DELETE CASCADE
 );
 
--- Tabela de integrações
 CREATE TABLE IF NOT EXISTS integracoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tipo ENUM('smtp', 'webhook') NOT NULL,
@@ -81,7 +73,6 @@ CREATE TABLE IF NOT EXISTS integracoes (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de logs de envio
 CREATE TABLE IF NOT EXISTS logs_envio (
     id INT AUTO_INCREMENT PRIMARY KEY,
     agendamento_id INT NOT NULL,
