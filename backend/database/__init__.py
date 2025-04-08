@@ -5,7 +5,6 @@ from mysql.connector import Error
 def init_db():
     """Inicializa o banco de dados com o schema definido."""
     try:
-        # Conectar ao MySQL sem selecionar um banco de dados
         connection = mysql.connector.connect(
             host=os.getenv('DB_HOST', 'localhost'),
             user=os.getenv('DB_USER', 'root'),
@@ -15,12 +14,10 @@ def init_db():
         if connection.is_connected():
             cursor = connection.cursor()
             
-            # Ler o arquivo schema.sql
             schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
             with open(schema_path, 'r') as file:
                 sql_commands = file.read()
-            
-            # Executar os comandos SQL
+                
             for command in sql_commands.split(';'):
                 if command.strip():
                     cursor.execute(command + ';')
