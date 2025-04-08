@@ -98,13 +98,11 @@ def criar_agendamento():
     try:
         data = request.get_json()
         
-        # Validação dos campos obrigatórios
         required_fields = ['template_id', 'segmento_id', 'assunto', 'data_envio']
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Campo '{field}' é obrigatório"}), 400
-        
-        # Validação da data de envio
+                
         try:
             data_envio = datetime.fromisoformat(data['data_envio'].replace('Z', '+00:00'))
             if data_envio < datetime.now():
@@ -112,7 +110,6 @@ def criar_agendamento():
         except ValueError:
             return jsonify({"error": "Formato de data inválido. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS)"}), 400
         
-        # Validação dos dados padrão
         dados_padrao = data.get('dados_padrao', {})
         if not isinstance(dados_padrao, dict):
             return jsonify({"error": "Dados padrão devem ser um objeto JSON"}), 400
@@ -193,15 +190,13 @@ def atualizar_agendamento(id):
         
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        
-        # Verificar se o agendamento existe
+
         cursor.execute("SELECT * FROM agendamentos WHERE id = %s", (id,))
         agendamento = cursor.fetchone()
         
         if not agendamento:
             return jsonify({"error": "Agendamento não encontrado"}), 404
-        
-        # Construir query de atualização
+
         update_fields = []
         params = []
         
@@ -241,14 +236,11 @@ def atualizar_agendamento(id):
         
         if not update_fields:
             return jsonify({"error": "Nenhum campo válido para atualização"}), 400
-        
-        # Adicionar data de atualização
+
         update_fields.append("updated_at = CURRENT_TIMESTAMP")
-        
-        # Adicionar ID aos parâmetros
+
         params.append(id)
-        
-        # Executar atualização
+
         query = f"UPDATE agendamentos SET {', '.join(update_fields)} WHERE id = %s"
         cursor.execute(query, params)
         connection.commit()
@@ -312,7 +304,6 @@ def obter_agendamento(agendamento_id):
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         
-        # Buscar agendamento
         cursor.execute("""
             SELECT 
                 a.*,
