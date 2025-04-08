@@ -88,8 +88,7 @@ def listar_campanhas():
 def criar_campanha():
     """Cria uma nova campanha de email."""
     dados = request.json
-    
-    # Validar campos obrigatórios
+
     if not dados or 'titulo' not in dados or 'template_id' not in dados:
         return jsonify({
             "error": "Os campos 'titulo' e 'template_id' são obrigatórios."
@@ -98,24 +97,20 @@ def criar_campanha():
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
-        
-        # Verificar se o template existe
+
         cursor.execute("SELECT id FROM templates WHERE id = %s", (dados['template_id'],))
         if not cursor.fetchone():
             return jsonify({"error": "Template não encontrado"}), 404
-            
-        # Verificar se o segmento existe (se fornecido)
+
         if 'segmento_id' in dados and dados['segmento_id'] is not None:
             cursor.execute("SELECT id FROM segmentos WHERE id = %s", (dados['segmento_id'],))
             if not cursor.fetchone():
                 return jsonify({"error": "Segmento não encontrado"}), 404
-        
-        # Preparar campos
+
         campos = ['titulo', 'template_id']
         valores = [dados['titulo'], dados['template_id']]
         placeholders = ['%s', '%s']
-        
-        # Adicionar campos opcionais
+
         if 'descricao' in dados and dados['descricao'] is not None:
             campos.append('descricao')
             valores.append(dados['descricao'])
@@ -126,7 +121,6 @@ def criar_campanha():
             valores.append(dados['segmento_id'])
             placeholders.append('%s')
         
-        # Construir query
         query = f"""
             INSERT INTO campanhas ({', '.join(campos)})
             VALUES ({', '.join(placeholders)})
@@ -195,13 +189,11 @@ def atualizar_campanha(id):
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
-        
-        # Verificar se a campanha existe
+
         cursor.execute("SELECT id FROM campanhas WHERE id = %s", (id,))
         if not cursor.fetchone():
             return jsonify({"error": "Campanha não encontrada"}), 404
-        
-        # Preparar campos para atualização
+
         campos = []
         valores = []
         
@@ -214,7 +206,6 @@ def atualizar_campanha(id):
             valores.append(dados['descricao'])
             
         if 'template_id' in dados:
-            # Verificar se o template existe
             cursor.execute("SELECT id FROM templates WHERE id = %s", (dados['template_id'],))
             if not cursor.fetchone():
                 return jsonify({"error": "Template não encontrado"}), 404
@@ -223,7 +214,6 @@ def atualizar_campanha(id):
             
         if 'segmento_id' in dados:
             if dados['segmento_id'] is not None:
-                # Verificar se o segmento existe
                 cursor.execute("SELECT id FROM segmentos WHERE id = %s", (dados['segmento_id'],))
                 if not cursor.fetchone():
                     return jsonify({"error": "Segmento não encontrado"}), 404
@@ -236,11 +226,9 @@ def atualizar_campanha(id):
         
         if not campos:
             return jsonify({"error": "Nenhum campo para atualizar"}), 400
-        
-        # Adicionar ID aos valores
+
         valores.append(id)
-        
-        # Construir query
+
         query = f"""
             UPDATE campanhas 
             SET {', '.join(campos)}
@@ -286,13 +274,11 @@ def remover_campanha(id):
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
-        
-        # Verificar se a campanha existe
+
         cursor.execute("SELECT id FROM campanhas WHERE id = %s", (id,))
         if not cursor.fetchone():
             return jsonify({"error": "Campanha não encontrada"}), 404
-        
-        # Remover a campanha
+
         cursor.execute("DELETE FROM campanhas WHERE id = %s", (id,))
         connection.commit()
         
